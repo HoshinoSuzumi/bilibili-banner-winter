@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fake bili banner</title>
+    <title>🍻 bili banner - winter (Jan 2021)</title>
     <link rel="stylesheet" href="assets/css/main.css">
     <style>
         body {
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
 
         .banner {
@@ -70,78 +71,86 @@
 
         .animated-banner .layer img.recall,
         .animated-banner .layer video.recall {
-            transition: all .3s ease;
+            transition: opacity .3s ease, transform .3s ease;
         }
     </style>
 </head>
 
 <body>
-    <div class="banner">
-        <div class="animated-banner">
-            <!-- 2016 155 -->
-            <!-- 2341 180 -->
-            <div class="layer">
-                <img src="img/banner/001.jpg"
-                    style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
-                    height="180">
-            </div>
-            <div class="layer">
-                <img src="img/banner/002.jpg"
-                    style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
-                    height="180">
-            </div>
-            <div class="layer">
-                <video loop="loop" autoplay="autoplay" src="img/banner/003.webm"
-                    style="object-fit: cover; transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 0;"
-                    width="2341" height="180"></video>
-            </div>
+<div class="banner">
+    <div class="animated-banner">
+        <div class="layer">
+            <img src="img/banner/001.jpg"
+                 style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
+                 height="180">
+        </div>
+        <div class="layer">
+            <img src="img/banner/002.jpg"
+                 style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
+                 height="180">
+        </div>
+        <div class="layer">
+            <video loop="loop" autoplay="autoplay" src="img/banner/003.webm"
+                   style="object-fit: cover; transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 0;"
+                   width="2341" height="180"></video>
         </div>
     </div>
+</div>
 
-    <script>
-        let clientSize = { w: document.documentElement.clientHeight, h: document.documentElement.clientWidth };
-        let elemBanner = document.querySelector(".animated-banner");
-        let elemLayers = document.querySelectorAll(".animated-banner .layer");
+<script>
+    const opacityRatio = 2;
 
-        window.onresize = (e) => {
-            clientSize.h = document.documentElement.clientHeight;
-            clientSize.w = document.documentElement.clientWidth;
-        };
+    let clientSize = {w: document.documentElement.clientHeight, h: document.documentElement.clientWidth};
+    const elemBanner = document.querySelector(".animated-banner");
+    const elemLayers = document.querySelectorAll(".animated-banner .layer > *");
 
-        let isFirstIn = true;
-        let inLayerX = 0;
+    window.onload = (e) => {
+        applyLayerWH();
+    };
 
-        elemBanner.addEventListener("mousemove", (e) => {
-            inLayerX = isFirstIn ? e.layerX : inLayerX;
-            isFirstIn = false;
+    window.onresize = (e) => {
+        clientSize = {w: document.documentElement.clientWidth, h: document.documentElement.clientHeight}
+        applyLayerWH();
+    };
 
-            let offsetLeft = (1 - 3.5 * (inLayerX - e.layerX) / inLayerX);
-            if (offsetLeft <= 0) offsetLeft = 0;
-            if (offsetLeft >= 1) offsetLeft = 1;
-            let offsetRight = -(1 - 3.5 * (e.layerX - inLayerX) / inLayerX);
-            if (offsetRight <= 0) offsetRight = 0;
-            if (offsetRight >= 1) offsetRight = 1;
+    function applyLayerWH() {
+        elemLayers.forEach((elem) => {
+            let scale = (elem.naturalHeight || elem.videoHeight) / (elem.naturalWidth || elem.videoWidth);
+            elem.height = elem.parentElement.clientHeight;
+            elem.width = elem.parentElement.clientHeight / scale;
+        })
+    }
 
-            elemLayers[1].firstElementChild.style.opacity = offsetLeft;
-            elemLayers[2].firstElementChild.style.opacity = offsetRight;
+    let isFirstIn = true;
+    let inLayerX = 0;
 
-            elemLayers.forEach((elem) => {
-                elem.firstElementChild.style.webkitTransform = "scale(" + 1 + ") translate(" + (inLayerX - e.layerX) / 10 + "px) rotate(" + 0 + "deg)";
-                elem.firstElementChild.classList.remove('recall');
-            });
+    elemBanner.addEventListener("mousemove", (e) => {
+        inLayerX = isFirstIn ? e.layerX : inLayerX;
+        isFirstIn = false;
+
+        let offsetLeft = Math.max(0, Math.min(1, (1 - (inLayerX - e.layerX) / clientSize.w * opacityRatio)));
+        let offsetRight = Math.max(0, Math.min(1, ((e.layerX - inLayerX) / clientSize.w * opacityRatio)));
+
+        elemLayers[1].style.opacity = offsetLeft.toString();
+        elemLayers[2].style.opacity = offsetRight.toString();
+
+        elemLayers.forEach((elem) => {
+            elem.style.transform = "scale(" + 1 + ") translate(" + (inLayerX - e.layerX) / 10 + "px) rotate(" + 0 + "deg)";
+            elem.classList.remove('recall');
         });
+    });
 
-        elemBanner.addEventListener("mouseleave", (e) => {
-            isFirstIn = true;
-            elemLayers[1].firstElementChild.style.opacity = 1;
-            elemLayers[2].firstElementChild.style.opacity = 0;
+    elemBanner.addEventListener("mouseleave", (e) => {
+        isFirstIn = true;
+        elemLayers[1].style.opacity = '' + 1;
+        elemLayers[2].style.opacity = '' + 0;
 
-            elemLayers.forEach((elem) => {
-                elem.firstElementChild.style.webkitTransform = "scale(1) translate(0px) rotate(0deg)";
-                elem.firstElementChild.classList.add('recall');
-            });
+        elemLayers.forEach((elem) => {
+            elem.style.transform = "scale(1) translate(0px) rotate(0deg)";
+            elem.classList.add('recall');
         });
-    </script>
+    });
+</script>
 </body>
 
 </html>
