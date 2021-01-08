@@ -90,7 +90,7 @@
                  height="180">
         </div>
         <div class="layer">
-            <video loop="loop" autoplay="autoplay" src="img/banner/003.webm"
+            <video loop autoplay muted src="img/banner/003.webm"
                    style="object-fit: cover; transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 0;"
                    width="2341" height="180"></video>
         </div>
@@ -99,6 +99,7 @@
 
 <script>
     const opacityRatio = 2;
+    const translateRatio = 8;
 
     let clientSize = {w: document.documentElement.clientHeight, h: document.documentElement.clientWidth};
     const elemBanner = document.querySelector(".animated-banner");
@@ -135,7 +136,7 @@
         elemLayers[2].style.opacity = offsetRight.toString();
 
         elemLayers.forEach((elem) => {
-            elem.style.transform = "scale(" + 1 + ") translate(" + (inLayerX - e.layerX) / 10 + "px) rotate(" + 0 + "deg)";
+            elem.style.transform = "scale(" + 1 + ") translate(" + (inLayerX - e.layerX) / translateRatio + "px) rotate(" + 0 + "deg)";
             elem.classList.remove('recall');
         });
     });
