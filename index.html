@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake bili banner</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .banner {
+            margin: 0 auto;
+            padding: 0;
+            position: relative;
+            z-index: 0;
+            min-height: 155px;
+            height: 9.375vw;
+            min-width: 999px;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            background-repeat: no-repeat;
+            background-position: center 0;
+            background-size: cover;
+            box-sizing: border-box;
+            font: 14px -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif;
+        }
+
+        .banner .logo {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: block;
+            position: absolute;
+            z-index: 1;
+        }
+
+        .banner .logo img {
+            bottom: 0;
+            left: 0;
+        }
+
+        .banner .animated-banner {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .animated-banner .layer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-pack: center;
+            justify-content: center;
+        }
+
+        .animated-banner .layer img.recall,
+        .animated-banner .layer video.recall {
+            transition: all .3s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="banner">
+        <div class="animated-banner">
+            <!-- 2016 155 -->
+            <!-- 2341 180 -->
+            <div class="layer">
+                <img src="img/banner/001.jpg"
+                    style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
+                    height="180">
+            </div>
+            <div class="layer">
+                <img src="img/banner/002.jpg"
+                    style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
+                    height="180">
+            </div>
+            <div class="layer">
+                <video loop="loop" autoplay="autoplay" src="img/banner/003.webm"
+                    style="object-fit: cover; transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 0;"
+                    width="2341" height="180"></video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let clientSize = { w: document.documentElement.clientHeight, h: document.documentElement.clientWidth };
+        let elemBanner = document.querySelector(".animated-banner");
+        let elemLayers = document.querySelectorAll(".animated-banner .layer");
+
+        window.onresize = (e) => {
+            clientSize.h = document.documentElement.clientHeight;
+            clientSize.w = document.documentElement.clientWidth;
+        };
+
+        let isFirstIn = true;
+        let inLayerX = 0;
+
+        elemBanner.addEventListener("mousemove", (e) => {
+            inLayerX = isFirstIn ? e.layerX : inLayerX;
+            isFirstIn = false;
+
+            let offsetLeft = (1 - 3.5 * (inLayerX - e.layerX) / inLayerX);
+            if (offsetLeft <= 0) offsetLeft = 0;
+            if (offsetLeft >= 1) offsetLeft = 1;
+            let offsetRight = -(1 - 3.5 * (e.layerX - inLayerX) / inLayerX);
+            if (offsetRight <= 0) offsetRight = 0;
+            if (offsetRight >= 1) offsetRight = 1;
+
+            elemLayers[1].firstElementChild.style.opacity = offsetLeft;
+            elemLayers[2].firstElementChild.style.opacity = offsetRight;
+
+            elemLayers.forEach((elem) => {
+                elem.firstElementChild.style.webkitTransform = "scale(" + 1 + ") translate(" + (inLayerX - e.layerX) / 10 + "px) rotate(" + 0 + "deg)";
+                elem.firstElementChild.classList.remove('recall');
+            });
+        });
+
+        elemBanner.addEventListener("mouseleave", (e) => {
+            isFirstIn = true;
+            elemLayers[1].firstElementChild.style.opacity = 1;
+            elemLayers[2].firstElementChild.style.opacity = 0;
+
+            elemLayers.forEach((elem) => {
+                elem.firstElementChild.style.webkitTransform = "scale(1) translate(0px) rotate(0deg)";
+                elem.firstElementChild.classList.add('recall');
+            });
+        });
+    </script>
+</body>
+
+</html>
