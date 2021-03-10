@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.banner {
+    --height: 155px;
+    width: 100vw;
+    height: var(--height);
+}
+
+.animated {
+    width: 100vw;
+    position: relative;
+    height: var(--height);
+}
+
+.animated .layer {
+    top: 0;
+    left: 50%;
+    width: auto;
+    position: absolute;
+    height: var(--height);
+    transform: translateX(-50%);
+}
+
+.animated .layer > img,
+.animated .layer > video {
+    height: 100%;
+    display: block;
+    line-height: 0;
+}
+
+.animated.css-animated {
+    transition: all .3s ease;
+}
+
+.animated.css-animated .layer {
+    transition: all .3s ease;
+}
