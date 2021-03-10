@@ -1,157 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍻 bili banner - winter (Jan 2021)</title>
     <link rel="stylesheet" href="assets/css/main.css">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        .banner {
-            margin: 0 auto;
-            padding: 0;
-            position: relative;
-            z-index: 0;
-            min-height: 155px;
-            height: 9.375vw;
-            min-width: 999px;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            background-repeat: no-repeat;
-            background-position: center 0;
-            background-size: cover;
-            box-sizing: border-box;
-            font: 14px -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif;
-        }
-
-        .banner .logo {
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            display: block;
-            position: absolute;
-            z-index: 1;
-        }
-
-        .banner .logo img {
-            bottom: 0;
-            left: 0;
-        }
-
-        .banner .animated-banner {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-        .animated-banner .layer {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            -ms-flex-align: center;
-            align-items: center;
-            -ms-flex-pack: center;
-            justify-content: center;
-        }
-
-        .animated-banner .layer img.recall,
-        .animated-banner .layer video.recall {
-            transition: opacity .3s ease, transform .3s ease;
-        }
-    </style>
 </head>
-
 <body>
 <div class="banner">
-    <div class="animated-banner">
-        <div class="layer">
-            <img src="img/banner/001.jpg"
-                 style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
-                 height="180">
+    <div class="animated" style="transform: translateX(0);">
+        <div class="layer" style="opacity: 0;">
+            <img src="img/banner/001.jpg" alt="001"/>
         </div>
-        <div class="layer">
-            <img src="img/banner/002.jpg"
-                 style="transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 1;" width="2341"
-                 height="180">
+        <div class="layer" style="opacity: 1;">
+            <img src="img/banner/002.jpg" alt="002"/>
         </div>
-        <div class="layer">
-            <video loop autoplay muted src="img/banner/003.webm"
-                   style="object-fit: cover; transform: scale(1) translate(0px) rotate(0deg); filter: blur(0px); opacity: 0;"
-                   width="2341" height="180"></video>
+        <div class="layer" style="opacity: 0;">
+            <video loop autoplay muted src="img/banner/003.webm"></video>
         </div>
     </div>
 </div>
-
 <script>
-    const opacityRatio = 2;
-    const translateRatio = 12;
-
-    let clientSize = {w: document.documentElement.clientHeight, h: document.documentElement.clientWidth};
-    const elemBanner = document.querySelector(".animated-banner");
-    const elemLayers = document.querySelectorAll(".animated-banner .layer > *");
-
-    window.onload = (e) => {
-        applyLayerWH();
-    };
-
-    window.onresize = (e) => {
-        clientSize = {w: document.documentElement.clientWidth, h: document.documentElement.clientHeight}
-        applyLayerWH();
-    };
-
-    function applyLayerWH() {
-        elemLayers.forEach((elem) => {
-            let scale = (elem.naturalHeight || elem.videoHeight) / (elem.naturalWidth || elem.videoWidth);
-            elem.height = elem.parentElement.clientHeight;
-            elem.width = elem.parentElement.clientHeight / scale;
-        })
+  let $;
+  window.$ = $ = function (el) {
+    // 个人习惯按条件更改
+    if (typeof el === "string") {
+      const elList = document.getElementsByClassName(el)
+      return elList.length > 1 ? elList : elList[0]
+    } else {
+      window.addEventListener('load', el)
     }
-
-    let isFirstIn = true;
-    let inLayerX = 0;
-
-    elemBanner.addEventListener("mousemove", (e) => {
-        inLayerX = isFirstIn ? e.layerX : inLayerX;
-        isFirstIn = false;
-
-        let offsetLeft = Math.max(0, Math.min(1, (1 - (inLayerX - e.layerX) / clientSize.w * opacityRatio)));
-        let offsetRight = Math.max(0, Math.min(1, ((e.layerX - inLayerX) / clientSize.w * opacityRatio)));
-
-        elemLayers[1].style.opacity = offsetLeft.toString();
-        elemLayers[2].style.opacity = offsetRight.toString();
-
-        elemLayers.forEach((elem) => {
-            elem.style.transform = "scale(" + 1 + ") translate(" + (inLayerX - e.layerX) / translateRatio + "px) rotate(" + 0 + "deg)";
-            elem.classList.remove('recall');
-        });
-    });
-
-    elemBanner.addEventListener("mouseleave", (e) => {
-        isFirstIn = true;
-        elemLayers[1].style.opacity = '' + 1;
-        elemLayers[2].style.opacity = '' + 0;
-
-        elemLayers.forEach((elem) => {
-            elem.style.transform = "scale(1) translate(0px) rotate(0deg)";
-            elem.classList.add('recall');
-        });
-    });
+  }
+  //
+  $(function () {
+    // 获取图层
+    const mainLayer = $('banner')
+    const animatedLayer = $('animated')
+    const [leftLayer, theLayer, rightLayer] = $('layer')
+    // 初始化变量
+    let countEnter = 0; // 移入位置
+    const resistance = 110; // 阻力
+    const opacityDistance = 70; // 透明的距离
+    // 初始化方法
+    const sizeLimit = (val, min = 0, max = 1) => Math.min(Math.max(val, min), max)
+    const getWidth = () => ((leftLayer.offsetWidth - animatedLayer.offsetWidth) / 2)
+    // 光标进入
+    const onEnter = ({clientX}) => (countEnter = clientX)
+    // 光标移动
+    const onMove = ({clientX}) => {
+      const differenceWidth = getWidth()
+      let translateX = countEnter - clientX // 光标偏移量
+      // 偏移量阻力计算
+      const resistanceOffset = ((translateX / resistance / 100))
+      translateX *= translateX > 0 ? resistanceOffset : -resistanceOffset
+      // Box 盒子偏移
+      animatedLayer.style.transform = `translateX(${sizeLimit(translateX, -differenceWidth, differenceWidth)}px)`
+      // 透明的计算
+      const opacity = sizeLimit((translateX >= 0 ? translateX : -translateX) / opacityDistance)
+      theLayer.style.opacity = (1 - opacity).toString()
+      if (translateX >= 0) {
+        leftLayer.style.opacity = opacity.toString()
+      } else {
+        rightLayer.style.opacity = opacity.toString()
+      }
+    }
+    // 光标离开 ~ 进入css动画 ~ 全部参数重置
+    const onLeave = () => {
+      animatedLayer.classList.add('css-animated')
+      theLayer.style.opacity = '1'
+      leftLayer.style.opacity = '0'
+      rightLayer.style.opacity = '0'
+      animatedLayer.style.transform = 'translateX(0)'
+      setTimeout(function () {
+        animatedLayer.classList.remove('css-animated')
+      }, 300)
+    }
+    // 绑定方法
+    mainLayer.addEventListener('mousemove', onMove)
+    mainLayer.addEventListener('mouseenter', onEnter)
+    mainLayer.addEventListener('mouseleave', onLeave)
+  })
 </script>
 </body>
-
 </html>
